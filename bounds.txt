@@ -1,0 +1,81 @@
+***number of subjects does not change when a player dies
+
+Vec cam_offset;
+default bounds:
+    Stage_GetCameraOffset2D(&cam_offset);
+    bounds->x_min = cam_offset.x - 40.0;
+    bounds-y_min = cam_offset.y - 40.0;
+    bounds->x_max = cam_offset.x + 40.0;
+    bounds-y_max = cam_offset.y + 40.0;
+
+
+Camera_UpdateTargetPosition (80029cf8) ::
+responsible for updating target position / interest
+
+Camera_LerpInterest (80029aac) ::
+responsible for updating interest based on target interest
+
+
+Stage_GetCameraOffset2D(&cam_offset);
+
+float bounds_width = bounds->x_max - bounds->x_min;
+float bounds_height = bounds->y_max - bounds->y_min;
+
+float bounds_length = bounds_height;
+
+if (bounds_height < bounds_width) {
+    bounds_length = bounds_width;
+}
+
+unk = 0.0682;
+if ((bounds_length <= 120.0) && (unk = 0.0, 60.0 <= bounds_length)) {
+    unk = 0.0682 * (bounds_length - 60.0) / (120.0 - 60.0);
+}
+
+[if bounds_length was 90, unk = 0.0341]
+
+// unk seems to be a scale factor (max being 0.5)
+dVar6 = ((bounds->y_min - cam_offset.y) + (bounds->y_max - cam_offset.y)) * (0.5 - unk) + cam_offset.y;
+
+float stage_vertical_rot = GetStageVerticalRotation();
+
+angle_unk = -((dVar6 - 30.0) * stage_vertical_rot) * deg2rad);
+
+if (angle_unk > 5.0 * deg2rad) {
+    angle_unk = 5.0 * deg2rad;
+}
+
+if (angle_unk < -7.0 * deg2rad) {
+    angle_unk = -7.0 * deg2rad;
+}
+
+// get stage tilt in radians
+float stage_tilt = GetStageTilt();
+float total_tilt = angle_unk + stage_tilt;
+fov_up? = (movement->angle * deg2rad) * 0.5 + total_tilt;
+dVar3 = total_tilt;
+
+if (1.570796370506287 <= fov_up?) {
+    __assert("camera.c",0x4fa,"fov_u<MTXDegToRad(90.0F)");
+}
+
+fov_down? = (movement->angle * deg2rad) * 0.5 - total_tilt;
+if (1.570796370506287 <= fov_down?) {
+    __assert("camera.c",0x4fb,"fov_d<MTXDegToRad(90.0F)");
+}
+
+// dVar6 = tan(fov_up?);
+// dVar7 = tan(fov_down?);
+
+// frustum_height = (bounds->y_max - bounds->y_min) / (dVar6 + dVar7);
+
+// calculate height of view frustum? (chatgpt)
+frustum_height = (bounds->y_max - bounds->y_min) / (tan(fov_up?) + tan(fov_down?));
+
+Stage_GetCameraLimitBottom();
+Stage_GetCameraLimitTop();
+
+// dVar3 = tan(total_tilt);
+// apply tilt to frustum
+frustum_height_tilted = frustum_height * tan(total_tilt);
+(movement->target_interest).y = (frustum_height_tilted + -(frustum_height * tan(fov_up?) - bounds->y_max));

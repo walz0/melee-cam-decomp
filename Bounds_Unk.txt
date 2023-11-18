@@ -1,0 +1,58 @@
+void Vector_Rotate(double angle, Vec *input_vec?, int param_5)
+{
+    float fVar1;
+    double x_val;
+    double y_val;
+    double z_val;
+    double unk2;
+    float unk3;
+
+    if (angle <= PI) {
+        unk2 = angle;
+        if (angle < -PI) {
+            unk2 = (angle + 2PI);
+        }
+    }
+    else {
+        unk2 = (angle - 2PI);
+    }
+    fVar1 = (unk2 * (unk2 * (unk2 * ((unk2 * 0.005643) * unk2))) + (unk2 * 0.987862 - (unk2 * ((unk2 * 0.155271) * unk2))));
+
+    unk3 = (angle + PI/2);
+    if (unk3 <= PI) {
+        if (unk3 < -PI) {
+            unk3 = unk3 + 2PI;
+        }
+    }
+    else {
+        unk3 = unk3 - 2PI;
+    }
+                    /* fVar2^5 * 0.005643 + (fVar2 * 0.987862 - fVar2^3 * 0.155271); */
+    unk3 = unk3 * unk3 * unk3 * unk3 * 0.005643 * unk3 + (unk3 * 0.987862 - unk3 * unk3 * 0.155271 * unk3);
+
+
+
+    if (param_5 != 3) {
+        if (param_5 < 3) {
+            if (param_5 == 1) {
+                x_val? = input_vec?->x;
+                z_delta? = (input_vec?->y * unk3 - input_vec?->z * fVar1);
+                param_3 = (input_vec?->y * fVar1 + input_vec?->z * unk3);
+            }
+            else if (0 < param_5) {
+                z_delta? = input_vec?->y;
+                param_3 = (input_vec?->z * unk3 - input_vec?->x * fVar1);
+                x_val? = (input_vec?->x * unk3 + input_vec?->z * fVar1);
+            }
+        }
+        else if (param_5 < 5) {
+            param_3 = input_vec?->z;
+            x_val? = (input_vec?->x * unk3 - input_vec?->y * fVar1);
+            z_delta? = (input_vec?->x * fVar1 + input_vec?->y * unk3);
+        }
+    }
+    input_vec?->x = x_val?;
+    input_vec?->y = z_delta?;
+    input_vec?->z = param_3;
+    return;
+}

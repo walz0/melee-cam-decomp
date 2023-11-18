@@ -1,0 +1,24 @@
+void SetCameraBound_Z(CameraBounds *bounds,CameraMovement *movement)
+
+{
+    float halfAngleTan = tan((movement->target_fov * 0.01745329));
+    
+    float verticalDistance = ((bounds->y_max - bounds->y_min) / halfAngleTan);
+    float horizontalDistance = ((bounds->x_max - bounds->x_min) / (DefaultCameraCObjDesc.u.perspective.aspect * halfAngleTan));
+
+    float distance;
+    if (verticalDistance < horizontalDistance) {
+        distance = horizontalDistance;
+    }
+    float cam_dist_min = StageInfo_GetCamDistMin();
+    float cam_dist;
+    if (distance < cam_dist_min) {
+        cam_dist = StageInfo_GetCamDistMin();
+    }
+    float cam_dist_max = StageInfo_GetCamDistMax();
+    if (cam_dist > cam_dist_max) {
+        dVar1 = StageInfo_GetCamDistMax();
+    }
+    bounds->z_pos = dVar1;
+    return;
+}

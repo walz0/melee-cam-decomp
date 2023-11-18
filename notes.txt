@@ -1,0 +1,39 @@
+ps - paired single
+
+psq_l - dequantize and load
+psq_st - quantize and store
+
+
+
+CObj
+WObj* eye_position
+WObj* interest
+
+
+tan(x) = o/a
+
+80029bc4 SetCameraBound_Z
+Decides how to zoom the camera based on the ratio between the current bounds and the angle
+
+8002a768 Big camera func
+
+8001044c another big cam func
+803690b4 HSD_SetUpVector for rotation
+
+
+x = 0.005642999894917011
+y = 0.9878619909286499
+z = 0.1552709937095642
+
+
+(x * unk2^5) + (unk2 * y - (z * unk2^3))
+
+  fVar2 = fVar2^5 * 0.005643 + (fVar2 * 0.987862 - fVar2^3 * 0.155271);
+
+0.005643x^{5}+\left(0.987862x\ -\ 0.155271x^{3}\right)
+
+
+interest formula ::
+
+  (movement->interest).x = ((movement->target_interest).x - (movement->interest).x) * damp + (movement->interest).x;
+  (movement->interest).y = ((movement->target_interest).y - (movement->interest).y) * damp + (movement->interest).y;

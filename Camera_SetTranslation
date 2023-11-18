@@ -1,0 +1,47 @@
+void Camera_SetTranslation?(CameraBounds *bounds,CameraMovement *movement)
+{
+  float fVar1;
+  bool singleplayer;
+  double dVar2;
+  double dVar3;
+  double dVar4;
+  double dVar5;
+  double dVar6;
+  double dVar7;
+  
+  dVar6 = (MainCamera.field11_0x8c.field6_0x18 * MainCamera.field11_0x8c.field8_0x20
+                  * 10.0);
+  dVar4 = (MainCamera.field11_0x8c.field7_0x1c * MainCamera.field11_0x8c.field8_0x20
+                  * 10.0);
+  singleplayer = IsSinglePlayerMode();
+  if (singleplayer) {
+    dVar6 = (dVar6 * 1.2);
+    dVar4 = (dVar4 * 1.2);
+  }
+  dVar7 = (dVar6 * MainCamera.cstick_unk);
+  dVar5 = (dVar4 * MainCamera.cstick_unk);
+  dVar4 = tan((movement->fov * deg2rad * 0.5));
+  fVar1 = (bounds->z_pos * dVar4);
+  float horizontal_unk = (DefaultCameraCObjDesc.u.perspective.aspect * (fVar1 / ((DefaultCameraCObjDesc.viewport_right - DefaultCameraCObjDesc.viewport_left ^ 0b10000000000000000000000000000000)) * 0.5)));
+  float vertical_unk = (fVar1 / ((DefaultCameraCObjDesc.viewport_bottom - DefaultCameraCObjDesc.viewport_top ^ 0b10000000000000000000000000000000)) * 0.5));
+                    /* 0x3fe0000000000000 is 0.5 as a double */
+  float cam_dist_min = StageInfo_GetCamDistMin();
+  float cam_dist_max = StageInfo_GetCamDistMax();
+  float cam_dist = (cam_dist_max - cam_dist_min);
+
+  float depth = 0.0f;
+  if (cam_dist >= 0.001) {
+    depth = (bounds->z_pos - cam_dist_min) / cam_dist;
+  }
+  else {
+    depth = 0.5;
+  }
+
+  Camera_X&YTranslation_Store
+            (((depth * (0.6f - 1.0f) + 1.0f) * (cstick_unk * horizontal_unk)),
+             ((depth * (0.6f - 1.0f) + 1.0f) * (cstick_unk * vertical_unk)));
+  MainCamera.field11_0x8c.field6_0x18 = 0;
+  MainCamera.field11_0x8c.field7_0x1c = 0;
+  return;
+}
+

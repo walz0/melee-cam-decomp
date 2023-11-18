@@ -1,0 +1,16 @@
+angle = 30
+
+(38 - 30) * 0.1 + 30
+
+(8) * 0.1 + 30
+
+.8 + 30
+
+30.8
+
+half of the frustum width / viewport width
+
+(aspect_ratio * (fVar1 / (CONCAT44(0x43300000, viewport_width) - 0x4330000080000000) * 0.5)));
+
+
+((depth * (FLOAT_0.6 - FLOAT_1.0) + FLOAT_1.0) * frustum_scale_x),

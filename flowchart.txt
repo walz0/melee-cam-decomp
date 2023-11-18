@@ -1,0 +1,28 @@
+interest
+	8002af68 :: Camera_UpdateValues
+	translation starts at 0
+	target_interest->translation
+
+	bounds get updated
+	target_interest gets calculated based on new viewport
+	depth is also changed
+eye
+fov
+	bounds->z_pos
+bounds
+	subjects update bounds (800293e0 :: CmSubject_UpdateBoundsAll)
+	example of default bounds
+		left   -9
+		right  33
+		top    16
+		bottom -9
+
+limits
+subjects
+
+
+
+overall:
+	bounds change based on subjects
+	target interest changes based on bounds
+	interest lerps toward target interest
