@@ -24,8 +24,8 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
   float cam_bottom_override;
   float bottom_override_delta;
   Vec cam_offset;
-  Vec local_6c;
-  Vec local_60;
+  Vec scaled_bounds;
+  Vec unscaled_bounds;
   CmSubject *subject;
   
   subjects_enabled = 0;
@@ -51,7 +51,6 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
 
     float fixedness = (stage_fixedness * subject_fixedness);
 
-
     float override_offset = 1.0f;
     subjects_enabled = 0;
 
@@ -66,29 +65,29 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
       if (enabled) {
         subjects_enabled = subjects_enabled + 1;
 
-        local_60.x = (subject->focus).x;
-        local_60.y = (subject->focus).y;
-        local_60.z = (subject->focus).z;
+        unscaled_bounds.x = (subject->focus).x;
+        unscaled_bounds.y = (subject->focus).y;
+        unscaled_bounds.z = (subject->focus).z;
 
-        local_6c.x = (subject->focus).x;
-        local_6c.y = (subject->focus).y;
-        local_6c.z = (subject->focus).z;
+        scaled_bounds.x = (subject->focus).x;
+        scaled_bounds.y = (subject->focus).y;
+        scaled_bounds.z = (subject->focus).z;
 
-        subject_cam_bounds = CmSubject_IsInCameraBounds(&local_60,0);
+        subject_cam_bounds = CmSubject_IsInCameraBounds(&unscaled_bounds,0);
         if (subject_cam_bounds != 0) {
           GetCameraBottomOverride(&cam_bottom_override,&bottom_override_delta);
           cam_bottom_override = (cam_bottom_override + override_offset);
           if ((subject_cam_bounds & 0b00000100) != 0) {
             cam_limit = Stage_GetCameraLimitLeft();
-            local_60.x = cam_limit;
+            unscaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00001000) != 0) {
             cam_limit = Stage_GetCameraLimitRight();
-            local_60.x = cam_limit;
+            unscaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000001) != 0) {
             cam_limit = Stage_GetCameraLimitTop();
-            local_60.y = cam_limit;
+            unscaled_bounds.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
             float cam_limit_bottom = Stage_GetCameraLimitBottom();
@@ -96,27 +95,27 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             if (cam_limit < cam_limit_bottom) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
-            local_60.y = cam_limit;
+            unscaled_bounds.y = cam_limit;
           }
         }
         // focus x position + left bounds * fixedness
-        local_6c.x = ((subject->default_bounds).left * fixedness + local_60.x);
+        scaled_bounds.x = ((subject->default_bounds).left * fixedness + unscaled_bounds.x);
         // check bounds again in case this extends past the limit
-        subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
+        subject_cam_bounds = CmSubject_IsInCameraBounds(&scaled_bounds,0);
         if (subject_cam_bounds != 0) {
           GetCameraBottomOverride(&cam_bottom_override,&bottom_override_delta);
           cam_bottom_override = (cam_bottom_override + override_offset);
           if ((subject_cam_bounds & 0b00000100) != 0) {
             cam_limit = Stage_GetCameraLimitLeft();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00001000) != 0) {
             cam_limit = Stage_GetCameraLimitRight();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000001) != 0) {
             cam_limit = Stage_GetCameraLimitTop();
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
             cam_limit_bottom = Stage_GetCameraLimitBottom();
@@ -124,61 +123,61 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             if (cam_limit < cam_limit_bottom) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
         }
-        cam_limit = local_6c.x;
+        cam_limit = scaled_bounds.x;
         if (cam_limit < float.MAX) {
           x_min = cam_limit;
         }
         if (cam_limit > float.MIN) {
           x_max = cam_limit;
         }
-        local_6c.x = ((subject->default_bounds).right * dVar5 + local_60.x);
-        subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
+        scaled_bounds.x = ((subject->default_bounds).right * dVar5 + unscaled_bounds.x);
+        subject_cam_bounds = CmSubject_IsInCameraBounds(&scaled_bounds,0);
         if (subject_cam_bounds != 0) {
           GetCameraBottomOverride(&local_90,&fStack_8c);
           local_90 = (local_90 + dVar3);
           if ((subject_cam_bounds & 0b00000100) != 0) {
             cam_limit = Stage_GetCameraLimitLeft();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00001000) != 0) {
             cam_limit = Stage_GetCameraLimitRight();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000001) != 0) {
             cam_limit = Stage_GetCameraLimitTop();
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
           if (((subject_cam_bounds & 0b00000010) != 0) &&
              (cam_limit = Stage_GetCameraLimitBottom(), local_90 < cam_limit)) {
             Stage_GetCameraLimitBottom();
           }
         }
-        cam_limit = local_6c.x;
+        cam_limit = scaled_bounds.x;
         if (cam_limit < x_min) {
           x_min = cam_limit;
         }
         if (x_max < cam_limit) {
           x_max = cam_limit;
         }
-        local_6c.y = ((subject->default_bounds).bottom * dVar5 + local_60.y);
-        subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
+        scaled_bounds.y = ((subject->default_bounds).bottom * dVar5 + unscaled_bounds.y);
+        subject_cam_bounds = CmSubject_IsInCameraBounds(&scaled_bounds,0);
         if (subject_cam_bounds != 0) {
           GetCameraBottomOverride(&local_98,&fStack_94);
           local_98 = (local_98 + dVar3);
           if ((subject_cam_bounds & 0b00000100) != 0) {
             cam_limit = Stage_GetCameraLimitLeft();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00001000) != 0) {
             cam_limit = Stage_GetCameraLimitRight();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000001) != 0) {
             cam_limit = Stage_GetCameraLimitTop();
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
             dVar4 = Stage_GetCameraLimitBottom();
@@ -186,32 +185,32 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             if (cam_limit < dVar4) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
         }
-        cam_limit = local_6c.y;
+        cam_limit = scaled_bounds.y;
         if (cam_limit < y_min) {
           y_min = cam_limit;
         }
         if (y_max < cam_limit) {
           y_max = cam_limit;
         }
-        local_6c.y = ((subject->default_bounds).top * dVar5 + local_60.y);
-        subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
+        scaled_bounds.y = ((subject->default_bounds).top * dVar5 + unscaled_bounds.y);
+        subject_cam_bounds = CmSubject_IsInCameraBounds(&scaled_bounds,0);
         if (subject_cam_bounds != 0) {
           GetCameraBottomOverride(&local_a0,&fStack_9c);
           local_a0 = (local_a0 + dVar3);
           if ((subject_cam_bounds & 0b00000100) != 0) {
             cam_limit = Stage_GetCameraLimitLeft();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00001000) != 0) {
             cam_limit = Stage_GetCameraLimitRight();
-            local_6c.x = cam_limit;
+            scaled_bounds.x = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000001) != 0) {
             cam_limit = Stage_GetCameraLimitTop();
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
             dVar4 = Stage_GetCameraLimitBottom();
@@ -219,10 +218,10 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             if (cam_limit < dVar4) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
-            local_6c.y = cam_limit;
+            scaled_bounds.y = cam_limit;
           }
         }
-        cam_limit = local_6c.y;
+        cam_limit = scaled_bounds.y;
         if (cam_limit < y_min) {
           y_min = cam_limit;
         }
