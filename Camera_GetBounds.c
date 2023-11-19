@@ -1,6 +1,4 @@
-
 void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
-
 {
   float fVar1;
   float fVar2;
@@ -53,15 +51,15 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
 
     float fixedness = (stage_fixedness * subject_fixedness);
 
-    // hard limits for positive / negative
-    float float_max = 3.402823466385289e+38;
-    float float_min = -3.402823466385289e+38;
 
     float override_offset = 1.0f;
     subjects_enabled = 0;
 
-    in_f29 = float_min;
-    in_f31 = float_max;
+    // initialize values
+    float y_min = float.MAX; // dVar34
+    float y_max = float.MIN; // dVar125
+    float x_max = float.MIN; // f29
+    float x_min = float.MAX; // f31
 
     for (subject = UsedCmSubjectPoolHead; subject != (CmSubject *)0x0; subject = subject->prev) {
       enabled = CmSubject_IsEnabled(subject);
@@ -93,9 +91,9 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             local_60.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
-            dVar4 = Stage_GetCameraLimitBottom();
+            float cam_limit_bottom = Stage_GetCameraLimitBottom();
             cam_limit = cam_bottom_override;
-            if (cam_limit < dVar4) {
+            if (cam_limit < cam_limit_bottom) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
             local_60.y = cam_limit;
@@ -121,9 +119,9 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
             local_6c.y = cam_limit;
           }
           if ((subject_cam_bounds & 0b00000010) != 0) {
-            dVar4 = Stage_GetCameraLimitBottom();
+            cam_limit_bottom = Stage_GetCameraLimitBottom();
             cam_limit = cam_bottom_override;
-            if (cam_limit < dVar4) {
+            if (cam_limit < cam_limit_bottom) {
               cam_limit = Stage_GetCameraLimitBottom();
             }
             local_6c.y = cam_limit;
@@ -131,10 +129,10 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
         }
         cam_limit = local_6c.x;
         if (cam_limit < float.MAX) {
-          in_f31 = cam_limit;
+          x_min = cam_limit;
         }
         if (cam_limit > float.MIN) {
-          in_f29 = cam_limit;
+          x_max = cam_limit;
         }
         local_6c.x = ((subject->default_bounds).right * dVar5 + local_60.x);
         subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
@@ -159,11 +157,11 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
           }
         }
         cam_limit = local_6c.x;
-        if (cam_limit < in_f31) {
-          in_f31 = cam_limit;
+        if (cam_limit < x_min) {
+          x_min = cam_limit;
         }
-        if (in_f29 < cam_limit) {
-          in_f29 = cam_limit;
+        if (x_max < cam_limit) {
+          x_max = cam_limit;
         }
         local_6c.y = ((subject->default_bounds).bottom * dVar5 + local_60.y);
         subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
@@ -192,11 +190,11 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
           }
         }
         cam_limit = local_6c.y;
-        if (cam_limit < dVar34) {
-          dVar34 = cam_limit;
+        if (cam_limit < y_min) {
+          y_min = cam_limit;
         }
-        if (dVar125 < cam_limit) {
-          dVar125 = cam_limit;
+        if (y_max < cam_limit) {
+          y_max = cam_limit;
         }
         local_6c.y = ((subject->default_bounds).top * dVar5 + local_60.y);
         subject_cam_bounds = CmSubject_IsInCameraBounds(&local_6c,0);
@@ -225,11 +223,11 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
           }
         }
         cam_limit = local_6c.y;
-        if (cam_limit < dVar34) {
-          dVar34 = cam_limit;
+        if (cam_limit < y_min) {
+          y_min = cam_limit;
         }
-        if (dVar125 < cam_limit) {
-          dVar125 = cam_limit;
+        if (y_max < cam_limit) {
+          y_max = cam_limit;
         }
       }
     }
@@ -237,10 +235,10 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
                     /* default bounds */
   if (subjects_enabled == 0) {
     Stage_GetCameraOffset2D(&cam_offset);
-    in_f31 = (cam_offset.x - 40.0);
-    dVar34 = (cam_offset.y - 40.0);
-    in_f29 = (cam_offset.x + 40.0);
-    dVar125 = (cam_offset.y + 40.0);
+    x_min = (cam_offset.x - 40.0);
+    y_min = (cam_offset.y - 40.0);
+    x_max = (cam_offset.x + 40.0);
+    y_max = (cam_offset.y + 40.0);
   }
 
   float z_pos = (movement->position).z;
@@ -259,10 +257,10 @@ void Camera_GetBounds(CameraBounds *bounds,CameraMovement *movement)
   else {
     z_clamp? = 0.0;
   }
-  bounds->x_min = in_f31;
-  bounds->y_min = (dVar34 - (z_clamp? * 390.0 + 10.0));
-  bounds->x_max = in_f29;
-  bounds->y_max = dVar125;
+  bounds->x_min = x_min;
+  bounds->y_min = (y_min - (z_clamp? * 390.0 + 10.0));
+  bounds->x_max = x_max;
+  bounds->y_max = y_max;
   bounds->subjects = subjects_enabled;
   bounds->z_pos = z_pos;
   return;
