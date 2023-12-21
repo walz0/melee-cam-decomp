@@ -1,4 +1,4 @@
-void Camera_Target_Unk?(CameraMovement *movement, int param_2) {
+void Camera_CorrectFrustum(CameraMovement *movement, int param_2) {
   byte cam_type?;
   uint uVar1;
   bool is_neg;
